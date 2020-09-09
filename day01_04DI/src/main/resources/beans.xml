@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 依赖注入DI
+         能注入的数据结构：
+             1.基本数据类型和String
+             2.其他bean类型（在配置文件中或者注解中配置过的Bean）
+             3.复杂数据类型/集合类型
+         注入的方式：
+             1.构造函数注入
+             2.set方法注入
+             3.注解注入
+     -->
+    <!-- 构造函数注入
+         用到的标签：constructor-arg
+         使用位置：bean标签内部
+         标签的属性：
+            type: 通过指定数据类型的方式进行注入
+            index: 通过数组下标的方式进行注入
+            name: 通过名称查找的方式进行注入
+            value: 用于基本数据类型和String类型数据
+            ref: 用于指定其他bean类型数据
+    -->
+    <bean id="accountService" class="cn.bruce.service.impl.AccountServiceImpl">
+        <constructor-arg type="java.lang.String" value="Bruce"></constructor-arg>
+        <constructor-arg index="1" value="20"></constructor-arg>
+<!--        <constructor-arg name="birthday" value="2020-02-03"></constructor-arg>-->
+        <constructor-arg name="birthday" ref="currentTime"></constructor-arg>
+    </bean>
+
+    <!-- 实例化一个对象 -->
+    <bean id="currentTime" class="java.util.Date"></bean>
+
+    <!-- 通过set方法注入依赖
+         使用的标签：property
+         位置：bean标签内部
+         标签属性：
+            name: 用于指明需要set的属性
+            value: 用于提供基本数据类型和String数据类型
+            ref: 用于指定其他bean类型数据
+     -->
+    <bean id="accountService1" class="cn.bruce.service.impl.AccountServiceImpl1">
+        <property name="nnnname" value="Bruce"></property>
+        <property name="age" value="12"></property>
+        <property name="birthday" ref="currentTime"></property>
+    </bean>
+
+    <!-- 注入复杂数据类型
+        用于给List结构集合注入的标签：
+            list array set
+        用于个Map结构集合注入的标签:
+            map  props
+        结构相同，标签可以互换
+     -->
+    <bean id="accountService2" class="cn.bruce.service.impl.AccountServiceImpl2">
+        <property name="strs">
+            <array>
+                <value>A</value>
+                <value>A</value>
+                <value>B</value>
+                <value>C</value>
+            </array>
+        </property>
+
+        <property name="list">
+            <list>
+                <value>A</value>
+                <value>A</value>
+                <value>B</value>
+                <value>C</value>
+            </list>
+        </property>
+
+        <property name="set">
+            <set>
+                <value>A</value>
+                <value>B</value>
+                <value>C</value>
+            </set>
+        </property>
+
+        <property name="map">
+            <props>
+                <prop key="name">lex</prop>
+                <prop key="age">123</prop>
+                <prop key="sex">female</prop>
+            </props>
+
+        </property>
+
+        <property name="properties">
+            <map>
+                <entry key="name" value="Bruce"></entry>
+                <entry key="age" value="22"></entry>
+                <entry key="sex" value="male"></entry>
+            </map>
+        </property>
+    </bean>
+</beans>

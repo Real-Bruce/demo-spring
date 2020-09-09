@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 配置数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/base_crud"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="123456"></property>
+    </bean>
+
+    <!-- 配置queryRunner -->
+    <bean id="queryRunner" class="org.apache.commons.dbutils.QueryRunner"></bean>
+
+    <!-- 配置数据库连接工具类ConnectionUtils -->
+    <bean id="connectionUtils" class="cn.bruce.utils.ConnectionUtils">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="cn.bruce.utils.TransactionManager">
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+    <!-- 配置AOP -->
+    <aop:config>
+        <aop:pointcut id="pointcut" expression="execution(* cn.bruce.service.impl.*.*(..))"/>
+        <aop:aspect id="transactionMangerAdvice" ref="transactionManager">
+            <aop:before method="beginTransaction" pointcut-ref="pointcut"></aop:before>
+            <aop:after-returning method="commit" pointcut-ref="pointcut"></aop:after-returning>
+            <aop:after-throwing method="rollback" pointcut-ref="pointcut"></aop:after-throwing>
+            <aop:after method="release" pointcut-ref="pointcut"></aop:after>
+        </aop:aspect>
+    </aop:config>
+
+    <bean id="accountDao" class="cn.bruce.dao.impl.AccountDaoImpl">
+        <property name="queryRunner" ref="queryRunner"></property>
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+    <bean id="accountService" class="cn.bruce.service.impl.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"></property>
+    </bean>
+</beans>

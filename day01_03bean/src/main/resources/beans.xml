@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--bean对象的三种创建方式
+        方式一：通过默认构造函数创建对象
+        <bean id="accountService" class="cn.bruce.service.impl.AccountServiceImpl"></bean>
+    -->
+
+    <!-- 方式二：使用普通工厂模式创建对象
+        <bean id="initFactory" class="cn.bruce.factory.InitFactory"></bean>
+        <bean id="accountService" factory-bean="initFactory" factory-method="getAccountService"></bean>
+    -->
+
+    <!-- 方式三：使用静态工厂模式创建对象
+        <bean id="staticFactory" class="cn.bruce.factory.StaticFactory" factory-method="getAccountService"></bean>
+    -->
+
+    <!-- bean的scope属性
+         默认创建的就是单例对象singleton
+         prototype：多例的
+         <bean id="accountService" class="cn.bruce.service.impl.AccountServiceImpl" scope="prototype"></bean>
+    -->
+    <bean id="accountService" class="cn.bruce.service.impl.AccountServiceImpl" scope="singleton" init-method="init"
+          destroy-method="destory"
+    ></bean>
+
+</beans>

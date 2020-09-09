@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 数据库配置 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/base_crud"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="123456"></property>
+    </bean>
+
+    <!-- QueryRunner配置 -->
+    <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype"></bean>
+
+    <!-- 配置ConnectionUtils的工具类ConnectionUtils -->
+    <bean id="connectionUtils" class="cn.bruce.utils.ConnectionUtils">
+        <!-- 注入数据源 -->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="cn.bruce.utils.TransactionManager">
+        <!-- 注入ConnectionUtils -->
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+    <!-- 配置Dao对象 -->
+    <bean id="accountDao" class="cn.bruce.dao.impl.AccountDaoImpl">
+        <!-- 注入QueryRunner -->
+        <property name="runner" ref="runner"></property>
+        <!-- 注入ConnectionUtils -->
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+
+    <!-- 配置service -->
+    <bean id="accountService" class="cn.bruce.service.impl.AccountServiceImpl">
+        <!-- 注入dao对象 -->
+        <property name="accountDao" ref="accountDao"></property>
+    </bean>
+
+    <!-- 配置带事务的service -->
+    <bean id="accountService_OLD" class="cn.bruce.service.impl.AccountServiceImpl_OLD">
+        <property name="accountDao" ref="accountDao"></property>
+        <property name="transactionManager" ref="transactionManager"></property>
+    </bean>
+
+    <!-- 配置beanFactory -->
+    <bean id="beanFactory" class="cn.bruce.factory.BeanFactory">
+        <!-- 注入AccountService -->
+        <property name="accountService" ref="accountService"></property>
+        <!-- 注入事务管理器 -->
+        <property name="transactionManager" ref="transactionManager"></property>
+    </bean>
+
+    <!-- 配置代理service -->
+    <bean id="proxyAccountService" factory-bean="beanFactory" factory-method="getAccountService"></bean>
+
+</beans>
